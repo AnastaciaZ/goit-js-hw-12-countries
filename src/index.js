@@ -18,41 +18,39 @@ refs.searchInput.addEventListener('input', debounce(onSearch, 500));
 function onSearch(e) { 
     e.preventDefault();
     clearCoutryCard();
-    fetchApiCountries.query = e.target.value.trim(); //elements.query.value;
-    if (fetchApiCountries.query === '') { 
-        notification('erroe',"Введите название страны!");
-        return;
-    }
+    fetchApiCountries.query = e.target.value.trim(); 
+   
     fetchApiCountries.fetchCountries()
-        .then(renderCoutryCard)
-       // .then(clearCoutryCard)
+        .then(appendCountriesMarkup)
         .catch(error => console.log(error));
 }
 
-function renderCoutryCard(country) { 
-     const markupCard = countryCardTpl(country);
+function appendCountriesMarkup(country) {
+    if (country.length === 1) {
+        renderCoutryCard(country);
+    } else if (country.length >= 2 && country.length <= 10) {
+        renderCountriesList(country);
+    } else if (country.length > 10) {
+        inputError();
+    }
+}
+    
+function renderCoutryCard(country) {
+    const markupCard = countryCardTpl(country);
     refs.cardContainer.innerHTML = markupCard;
-    /*if (country.lenght === 1) {
-        const markupCard = countryCardTpl(country[0]);
-        refs.cardContainer.innerHTML = markupCard;
-    }
-    if (country.lenght >= 2 && country.lenght <= 10) {
-        const markupList = countryListTpl(country[0]);
-        refs.cardContainer.innerHTML = markupList;
-    }
-    if (country.lenght > 10) { 
-        console.log('необходимо сделать запрос более специфичным (плагин pnotify)');
-    }*/
-};
-/*function renderCountriesList(country) { 
+}
+
+function renderCountriesList(country) { 
     const markupList = countryListTpl(country);
     refs.cardContainer.innerHTML = markupList;
-}*/
+}
 
 function clearCoutryCard(country) { 
     refs.cardContainer.innerHTML = '';
 }
-
-function onFeatchError(){ 
-
+function inputError() { 
+     error({
+            title: 'Оу, как много стран!',
+            text: 'Сделайте ваш запрос более точным'
+        })
 }
